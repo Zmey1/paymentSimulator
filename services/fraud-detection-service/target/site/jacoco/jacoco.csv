@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+fraud-detection-service,com.payments.frauddetection,FraudDetectionApplication,8,0,0,0,3,0,2,0,2,0
+fraud-detection-service,com.payments.frauddetection.kafka,PaymentEventConsumer,37,0,0,0,12,0,3,0,3,0
+fraud-detection-service,com.payments.frauddetection.kafka,FraudResultProducer,47,0,2,0,11,0,4,0,3,0
+fraud-detection-service,com.payments.frauddetection.service,FraudCheckService,6,289,9,23,1,44,9,17,0,10
+fraud-detection-service,com.payments.frauddetection.config,FraudRuleProperties,0,53,0,0,0,21,0,11,0,11
+fraud-detection-service,com.payments.frauddetection.model,PaymentEvent,37,39,0,0,11,14,10,6,10,6

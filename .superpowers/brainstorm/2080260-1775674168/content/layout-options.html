@@ -1,0 +1,154 @@
+<h2>Dashboard Layout Options</h2>
+<p class="subtitle">Which layout structure feels right for showing both the payment form and the pipeline?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: #1a1a2e;">
+      <!-- Mockup A: Single page with sections -->
+      <div style="color: #e0e0e0; font-family: system-ui;">
+        <!-- Top nav -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 15px; background: #16213e; border-radius: 6px 6px 0 0; margin-bottom: 12px;">
+          <span style="font-weight:700; color:#4fc3f7; font-size:14px;">⬡ PayFlow Simulator</span>
+          <div style="display:flex; gap:8px;">
+            <span style="background:#0f3460; padding:2px 8px; border-radius:10px; font-size:10px; color:#4fc3f7;">Kafka ● Connected</span>
+            <span style="background:#0f3460; padding:2px 8px; border-radius:10px; font-size:10px; color:#27ae60;">DB ● Online</span>
+          </div>
+        </div>
+        <!-- Stats row -->
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <div style="flex:1; background:#16213e; padding:8px 10px; border-radius:6px; border-left:3px solid #4fc3f7;">
+            <div style="font-size:9px; color:#888;">TOTAL</div>
+            <div style="font-size:18px; font-weight:700; color:#fff;">247</div>
+          </div>
+          <div style="flex:1; background:#16213e; padding:8px 10px; border-radius:6px; border-left:3px solid #27ae60;">
+            <div style="font-size:9px; color:#888;">APPROVED</div>
+            <div style="font-size:18px; font-weight:700; color:#27ae60;">218</div>
+          </div>
+          <div style="flex:1; background:#16213e; padding:8px 10px; border-radius:6px; border-left:3px solid #e74c3c;">
+            <div style="font-size:9px; color:#888;">FLAGGED</div>
+            <div style="font-size:18px; font-weight:700; color:#e74c3c;">12</div>
+          </div>
+          <div style="flex:1; background:#16213e; padding:8px 10px; border-radius:6px; border-left:3px solid #e67e22;">
+            <div style="font-size:9px; color:#888;">PENDING</div>
+            <div style="font-size:18px; font-weight:700; color:#e67e22;">17</div>
+          </div>
+        </div>
+        <!-- Pipeline viz -->
+        <div style="background:#16213e; padding:10px; border-radius:6px; margin-bottom:12px;">
+          <div style="font-size:10px; color:#888; margin-bottom:8px;">EVENT PIPELINE</div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
+            <div style="background:#0f3460; padding:6px 10px; border-radius:4px; font-size:9px; text-align:center; border:1px solid #4fc3f7;">
+              <div style="font-size:7px; color:#4fc3f7;">①</div>
+              Payment<br>Service
+            </div>
+            <div style="color:#4fc3f7; font-size:12px;">→</div>
+            <div style="background:#0f3460; padding:6px 10px; border-radius:4px; font-size:9px; text-align:center; border:1px solid #e67e22;">
+              <div style="font-size:7px; color:#e67e22;">②</div>
+              Kafka<br>Events
+            </div>
+            <div style="color:#e67e22; font-size:12px;">→</div>
+            <div style="background:#0f3460; padding:6px 10px; border-radius:4px; font-size:9px; text-align:center; border:1px solid #e74c3c;">
+              <div style="font-size:7px; color:#e74c3c;">③</div>
+              Fraud<br>Detection
+            </div>
+            <div style="color:#27ae60; font-size:12px;">→</div>
+            <div style="background:#0f3460; padding:6px 10px; border-radius:4px; font-size:9px; text-align:center; border:1px solid #27ae60;">
+              <div style="font-size:7px; color:#27ae60;">④</div>
+              Notification<br>Service
+            </div>
+          </div>
+        </div>
+        <!-- Two columns: form + table -->
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; background:#16213e; padding:10px; border-radius:6px;">
+            <div style="font-size:10px; color:#888; margin-bottom:6px;">SUBMIT PAYMENT</div>
+            <div style="background:#0f3460; height:16px; border-radius:3px; margin-bottom:4px;"></div>
+            <div style="background:#0f3460; height:16px; border-radius:3px; margin-bottom:4px;"></div>
+            <div style="background:#0f3460; height:16px; border-radius:3px; margin-bottom:4px;"></div>
+            <div style="background:#4fc3f7; height:20px; border-radius:3px; width:60%;"></div>
+          </div>
+          <div style="flex:2; background:#16213e; padding:10px; border-radius:6px;">
+            <div style="font-size:10px; color:#888; margin-bottom:6px;">PAYMENT HISTORY</div>
+            <div style="background:#0f3460; height:12px; border-radius:2px; margin-bottom:3px;"></div>
+            <div style="background:#0f3460; height:12px; border-radius:2px; margin-bottom:3px;"></div>
+            <div style="background:#0f3460; height:12px; border-radius:2px; margin-bottom:3px;"></div>
+            <div style="background:#0f3460; height:12px; border-radius:2px; margin-bottom:3px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Single Page — All Visible</h3>
+      <p>Stats + Pipeline + Form + Table all on one scrollable page. Professor sees everything at a glance during demo. Fastest to build.</p>
+      <div class="pros-cons" style="margin-top:10px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Everything visible at once</li><li>Best for live demo</li><li>Fastest to implement</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Can feel dense on small screens</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: #1a1a2e;">
+      <!-- Mockup B: Tabbed/sidebar layout -->
+      <div style="color: #e0e0e0; font-family: system-ui;">
+        <!-- Top nav -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 15px; background: #16213e; border-radius: 6px 6px 0 0; margin-bottom: 12px;">
+          <span style="font-weight:700; color:#4fc3f7; font-size:14px;">⬡ PayFlow Simulator</span>
+          <div style="display:flex; gap:8px;">
+            <span style="background:#0f3460; padding:2px 8px; border-radius:10px; font-size:10px; color:#4fc3f7;">Kafka ● Connected</span>
+          </div>
+        </div>
+        <!-- Sidebar + Content -->
+        <div style="display:flex; gap:8px;">
+          <!-- Sidebar -->
+          <div style="width:50px; background:#16213e; border-radius:6px; padding:8px 4px;">
+            <div style="background:#4fc3f7; padding:6px 4px; border-radius:4px; text-align:center; margin-bottom:6px; font-size:8px;">📊</div>
+            <div style="background:transparent; padding:6px 4px; border-radius:4px; text-align:center; margin-bottom:6px; font-size:8px; color:#888;">💳</div>
+            <div style="background:transparent; padding:6px 4px; border-radius:4px; text-align:center; margin-bottom:6px; font-size:8px; color:#888;">🔍</div>
+            <div style="background:transparent; padding:6px 4px; border-radius:4px; text-align:center; font-size:8px; color:#888;">📝</div>
+          </div>
+          <!-- Main content area -->
+          <div style="flex:1;">
+            <!-- Tabs -->
+            <div style="display:flex; gap:2px; margin-bottom:8px;">
+              <div style="background:#4fc3f7; color:#1a1a2e; padding:4px 12px; border-radius:4px 4px 0 0; font-size:9px; font-weight:700;">Dashboard</div>
+              <div style="background:#16213e; color:#888; padding:4px 12px; border-radius:4px 4px 0 0; font-size:9px;">Payments</div>
+              <div style="background:#16213e; color:#888; padding:4px 12px; border-radius:4px 4px 0 0; font-size:9px;">Pipeline</div>
+              <div style="background:#16213e; color:#888; padding:4px 12px; border-radius:4px 4px 0 0; font-size:9px;">Logs</div>
+            </div>
+            <!-- Stats -->
+            <div style="display:flex; gap:6px; margin-bottom:8px;">
+              <div style="flex:1; background:#16213e; padding:6px 8px; border-radius:4px;">
+                <div style="font-size:8px; color:#888;">TOTAL</div>
+                <div style="font-size:16px; font-weight:700;">247</div>
+              </div>
+              <div style="flex:1; background:#16213e; padding:6px 8px; border-radius:4px;">
+                <div style="font-size:8px; color:#888;">APPROVED</div>
+                <div style="font-size:16px; font-weight:700; color:#27ae60;">218</div>
+              </div>
+              <div style="flex:1; background:#16213e; padding:6px 8px; border-radius:4px;">
+                <div style="font-size:8px; color:#888;">FLAGGED</div>
+                <div style="font-size:16px; font-weight:700; color:#e74c3c;">12</div>
+              </div>
+            </div>
+            <!-- Table area -->
+            <div style="background:#16213e; padding:8px; border-radius:6px;">
+              <div style="background:#0f3460; height:10px; border-radius:2px; margin-bottom:3px;"></div>
+              <div style="background:#0f3460; height:10px; border-radius:2px; margin-bottom:3px;"></div>
+              <div style="background:#0f3460; height:10px; border-radius:2px; margin-bottom:3px;"></div>
+              <div style="background:#0f3460; height:10px; border-radius:2px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Tabbed / Multi-Page</h3>
+      <p>Sidebar nav with separate views: Dashboard, Payments, Pipeline, Logs. Looks more like a real application. More work to build.</p>
+      <div class="pros-cons" style="margin-top:10px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Looks more professional/app-like</li><li>Each section gets full space</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>More code to write (routing)</li><li>Professor has to click around during demo</li><li>Slower to implement</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

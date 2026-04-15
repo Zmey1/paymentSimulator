@@ -1,0 +1,5 @@
+com/payments/frauddetection/kafka/PaymentEventConsumer.class
+com/payments/frauddetection/kafka/FraudResultProducer.class
+com/payments/frauddetection/FraudDetectionApplication.class
+com/payments/frauddetection/model/PaymentEvent.class
+com/payments/frauddetection/service/FraudCheckService.class

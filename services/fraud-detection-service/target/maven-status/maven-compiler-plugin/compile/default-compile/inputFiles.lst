@@ -1,0 +1,6 @@
+/home/zmey1/VSCODE_FILES/devops/services/fraud-detection-service/src/main/java/com/payments/frauddetection/model/PaymentEvent.java
+/home/zmey1/VSCODE_FILES/devops/services/fraud-detection-service/src/main/java/com/payments/frauddetection/config/FraudRuleProperties.java
+/home/zmey1/VSCODE_FILES/devops/services/fraud-detection-service/src/main/java/com/payments/frauddetection/kafka/PaymentEventConsumer.java
+/home/zmey1/VSCODE_FILES/devops/services/fraud-detection-service/src/main/java/com/payments/frauddetection/service/FraudCheckService.java
+/home/zmey1/VSCODE_FILES/devops/services/fraud-detection-service/src/main/java/com/payments/frauddetection/FraudDetectionApplication.java
+/home/zmey1/VSCODE_FILES/devops/services/fraud-detection-service/src/main/java/com/payments/frauddetection/kafka/FraudResultProducer.java

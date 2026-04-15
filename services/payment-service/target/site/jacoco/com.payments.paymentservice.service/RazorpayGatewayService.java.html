@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RazorpayGatewayService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payment-service</a> &gt; <a href="index.source.html" class="el_package">com.payments.paymentservice.service</a> &gt; <span class="el_source">RazorpayGatewayService.java</span></div><h1>RazorpayGatewayService.java</h1><pre class="source lang-java linenums"><span class="nc" id="L1">package com.payments.paymentservice.service;</span>
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.payments.paymentservice.config.RazorpayProperties;
+import com.payments.paymentservice.dto.RazorpayCheckoutStatusResponse;
+import com.payments.paymentservice.dto.RazorpayOrderRequest;
+import com.payments.paymentservice.dto.RazorpayOrderResponse;
+import com.payments.paymentservice.dto.RazorpayVerifyRequest;
+import com.payments.paymentservice.model.Payment;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Service
+public class RazorpayGatewayService {
+
+    private final RazorpayProperties razorpayProperties;
+    private final PaymentService paymentService;
+    private final ObjectMapper objectMapper;
+    private final HttpClient httpClient;
+<span class="nc" id="L38">    private final Map&lt;String, PendingRazorpayOrder&gt; pendingOrders = new ConcurrentHashMap&lt;&gt;();</span>
+
+<span class="nc" id="L40">    public RazorpayGatewayService(</span>
+            RazorpayProperties razorpayProperties,
+            PaymentService paymentService,
+            ObjectMapper objectMapper
+    ) {
+<span class="nc" id="L45">        this.razorpayProperties = razorpayProperties;</span>
+<span class="nc" id="L46">        this.paymentService = paymentService;</span>
+<span class="nc" id="L47">        this.objectMapper = objectMapper;</span>
+<span class="nc" id="L48">        this.httpClient = HttpClient.newHttpClient();</span>
+<span class="nc" id="L49">    }</span>
+
+    public RazorpayCheckoutStatusResponse getCheckoutStatus() {
+<span class="nc" id="L52">        boolean enabled = isConfigured();</span>
+<span class="nc" id="L53">        return new RazorpayCheckoutStatusResponse(</span>
+<span class="nc" id="L54">                enabled,</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                enabled ? razorpayProperties.getKeyId() : &quot;&quot;,</span>
+<span class="nc" id="L56">                razorpayProperties.getMerchantName(),</span>
+<span class="nc" id="L57">                razorpayProperties.getDescription(),</span>
+<span class="nc" id="L58">                razorpayProperties.getReceiverName()</span>
+        );
+    }
+
+    public RazorpayOrderResponse createOrder(RazorpayOrderRequest request) {
+<span class="nc" id="L63">        assertConfigured();</span>
+
+<span class="nc bnc" id="L65" title="All 4 branches missed.">        if (request == null || request.amount() &lt;= 0) {</span>
+<span class="nc" id="L66">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Amount must be greater than zero&quot;);</span>
+        }
+
+<span class="nc" id="L69">        long amountSubunits = Math.round(request.amount() * 100);</span>
+<span class="nc" id="L70">        Map&lt;String, Object&gt; payload = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L71">        payload.put(&quot;amount&quot;, amountSubunits);</span>
+<span class="nc" id="L72">        payload.put(&quot;currency&quot;, &quot;INR&quot;);</span>
+<span class="nc" id="L73">        payload.put(&quot;receipt&quot;, &quot;demo_&quot; + System.currentTimeMillis());</span>
+
+<span class="nc" id="L75">        Map&lt;String, String&gt; notes = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L76">        notes.put(&quot;customer_name&quot;, safeValue(request.customerName(), &quot;Customer&quot;));</span>
+<span class="nc" id="L77">        notes.put(&quot;receiver_name&quot;, razorpayProperties.getReceiverName());</span>
+<span class="nc" id="L78">        payload.put(&quot;notes&quot;, notes);</span>
+
+<span class="nc" id="L80">        JsonNode orderResponse = sendRequest(&quot;POST&quot;, &quot;/orders&quot;, payload);</span>
+<span class="nc" id="L81">        String orderId = text(orderResponse, &quot;id&quot;);</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (orderId.isBlank()) {</span>
+<span class="nc" id="L83">            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Razorpay did not return an order id&quot;);</span>
+        }
+
+<span class="nc" id="L86">        PendingRazorpayOrder pendingOrder = new PendingRazorpayOrder(</span>
+<span class="nc" id="L87">                orderId,</span>
+<span class="nc" id="L88">                amountSubunits,</span>
+<span class="nc" id="L89">                text(orderResponse, &quot;currency&quot;),</span>
+<span class="nc" id="L90">                safeValue(request.customerName(), &quot;Customer&quot;),</span>
+<span class="nc" id="L91">                safeValue(request.email(), &quot;&quot;),</span>
+<span class="nc" id="L92">                safeValue(request.contact(), &quot;&quot;),</span>
+<span class="nc" id="L93">                razorpayProperties.getReceiverName()</span>
+        );
+<span class="nc" id="L95">        pendingOrders.put(orderId, pendingOrder);</span>
+
+<span class="nc" id="L97">        return new RazorpayOrderResponse(</span>
+<span class="nc" id="L98">                razorpayProperties.getKeyId(),</span>
+<span class="nc" id="L99">                orderId,</span>
+<span class="nc" id="L100">                pendingOrder.amountSubunits(),</span>
+<span class="nc" id="L101">                pendingOrder.currency(),</span>
+<span class="nc" id="L102">                razorpayProperties.getMerchantName(),</span>
+<span class="nc" id="L103">                razorpayProperties.getDescription(),</span>
+<span class="nc" id="L104">                pendingOrder.customerName(),</span>
+<span class="nc" id="L105">                pendingOrder.email(),</span>
+<span class="nc" id="L106">                pendingOrder.contact()</span>
+        );
+    }
+
+    public Payment verifyAndCreatePayment(RazorpayVerifyRequest request) {
+<span class="nc" id="L111">        assertConfigured();</span>
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (request == null</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                || isBlank(request.razorpayOrderId())</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">                || isBlank(request.razorpayPaymentId())</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">                || isBlank(request.razorpaySignature())) {</span>
+<span class="nc" id="L117">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Missing Razorpay verification fields&quot;);</span>
+        }
+
+<span class="nc" id="L120">        PendingRazorpayOrder pendingOrder = pendingOrders.get(request.razorpayOrderId());</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (pendingOrder == null) {</span>
+<span class="nc" id="L122">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Unknown or expired Razorpay order&quot;);</span>
+        }
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (!isSignatureValid(pendingOrder.orderId(), request.razorpayPaymentId(), request.razorpaySignature())) {</span>
+<span class="nc" id="L126">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Invalid Razorpay signature&quot;);</span>
+        }
+
+<span class="nc" id="L129">        RazorpayPaymentDetails paymentDetails = fetchPaymentDetails(request.razorpayPaymentId());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (!Objects.equals(paymentDetails.orderId(), pendingOrder.orderId())) {</span>
+<span class="nc" id="L131">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Razorpay payment does not match the order&quot;);</span>
+        }
+
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (!&quot;captured&quot;.equalsIgnoreCase(paymentDetails.status())</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">                &amp;&amp; !&quot;authorized&quot;.equalsIgnoreCase(paymentDetails.status())) {</span>
+<span class="nc" id="L136">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Razorpay payment is not successful&quot;);</span>
+        }
+
+<span class="nc" id="L139">        Payment payment = new Payment();</span>
+<span class="nc" id="L140">        payment.setSender(pendingOrder.customerName());</span>
+<span class="nc" id="L141">        payment.setReceiver(pendingOrder.receiverName());</span>
+<span class="nc" id="L142">        payment.setAmount(pendingOrder.amountSubunits() / 100.0);</span>
+<span class="nc" id="L143">        payment.setPaymentType(normalizeMethod(paymentDetails.method()));</span>
+
+<span class="nc" id="L145">        Payment createdPayment = paymentService.createPayment(payment);</span>
+<span class="nc" id="L146">        pendingOrders.remove(request.razorpayOrderId());</span>
+<span class="nc" id="L147">        return createdPayment;</span>
+    }
+
+    private RazorpayPaymentDetails fetchPaymentDetails(String paymentId) {
+<span class="nc" id="L151">        JsonNode paymentResponse = sendRequest(</span>
+<span class="nc" id="L152">                &quot;GET&quot;,</span>
+<span class="nc" id="L153">                &quot;/payments/&quot; + URLEncoder.encode(paymentId, StandardCharsets.UTF_8),</span>
+<span class="nc" id="L154">                null</span>
+        );
+
+<span class="nc" id="L157">        return new RazorpayPaymentDetails(</span>
+<span class="nc" id="L158">                text(paymentResponse, &quot;id&quot;),</span>
+<span class="nc" id="L159">                text(paymentResponse, &quot;order_id&quot;),</span>
+<span class="nc" id="L160">                text(paymentResponse, &quot;status&quot;),</span>
+<span class="nc" id="L161">                text(paymentResponse, &quot;method&quot;)</span>
+        );
+    }
+
+    private JsonNode sendRequest(String method, String path, Object body) {
+<span class="nc" id="L166">        HttpRequest.Builder builder = HttpRequest.newBuilder()</span>
+<span class="nc" id="L167">                .uri(URI.create(resolveUrl(path)))</span>
+<span class="nc" id="L168">                .header(&quot;Authorization&quot;, authorizationHeader())</span>
+<span class="nc" id="L169">                .header(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        if (&quot;POST&quot;.equalsIgnoreCase(method)) {</span>
+<span class="nc" id="L172">            builder.header(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L173">            builder.POST(HttpRequest.BodyPublishers.ofString(writeBody(body)));</span>
+<span class="nc" id="L174">        } else {</span>
+<span class="nc" id="L175">            builder.GET();</span>
+        }
+
+        try {
+<span class="nc" id="L179">            HttpResponse&lt;String&gt; response = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());</span>
+<span class="nc bnc" id="L180" title="All 4 branches missed.">            if (response.statusCode() &lt; 200 || response.statusCode() &gt;= 300) {</span>
+<span class="nc" id="L181">                throw new ResponseStatusException(</span>
+<span class="nc" id="L182">                        HttpStatus.BAD_GATEWAY,</span>
+<span class="nc" id="L183">                        &quot;Razorpay request failed with status &quot; + response.statusCode()</span>
+                );
+            }
+<span class="nc" id="L186">            return objectMapper.readTree(response.body());</span>
+<span class="nc" id="L187">        } catch (IOException | InterruptedException exception) {</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">            if (exception instanceof InterruptedException) {</span>
+<span class="nc" id="L189">                Thread.currentThread().interrupt();</span>
+            }
+<span class="nc" id="L191">            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, &quot;Razorpay request failed&quot;, exception);</span>
+        }
+    }
+
+    private boolean isSignatureValid(String orderId, String paymentId, String signature) {
+        try {
+<span class="nc" id="L197">            String payload = orderId + &quot;|&quot; + paymentId;</span>
+<span class="nc" id="L198">            Mac mac = Mac.getInstance(&quot;HmacSHA256&quot;);</span>
+<span class="nc" id="L199">            mac.init(new SecretKeySpec(razorpayProperties.getKeySecret().getBytes(StandardCharsets.UTF_8), &quot;HmacSHA256&quot;));</span>
+<span class="nc" id="L200">            byte[] digest = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));</span>
+<span class="nc" id="L201">            String generatedSignature = bytesToHex(digest);</span>
+<span class="nc" id="L202">            return generatedSignature.equals(signature);</span>
+<span class="nc" id="L203">        } catch (Exception exception) {</span>
+<span class="nc" id="L204">            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, &quot;Could not verify Razorpay signature&quot;, exception);</span>
+        }
+    }
+
+    private String normalizeMethod(String method) {
+<span class="nc bnc" id="L209" title="All 4 branches missed.">        if (method == null || method.isBlank()) {</span>
+<span class="nc" id="L210">            return &quot;RAZORPAY&quot;;</span>
+        }
+
+<span class="nc bnc" id="L213" title="All 4 branches missed.">        return switch (method.toLowerCase(Locale.ROOT)) {</span>
+<span class="nc" id="L214">            case &quot;upi&quot; -&gt; &quot;UPI&quot;;</span>
+<span class="nc" id="L215">            case &quot;card&quot; -&gt; &quot;CARD&quot;;</span>
+<span class="nc" id="L216">            case &quot;bank_transfer&quot;, &quot;netbanking&quot;, &quot;ach&quot; -&gt; &quot;TRANSFER&quot;;</span>
+<span class="nc" id="L217">            default -&gt; method.toUpperCase(Locale.ROOT);</span>
+        };
+    }
+
+    private void assertConfigured() {
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (!isConfigured()) {</span>
+<span class="nc" id="L223">            throw new ResponseStatusException(</span>
+<span class="nc" id="L224">                    HttpStatus.SERVICE_UNAVAILABLE,</span>
+<span class="nc" id="L225">                    &quot;Razorpay test checkout is not configured&quot;</span>
+            );
+        }
+<span class="nc" id="L228">    }</span>
+
+    private boolean isConfigured() {
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        return razorpayProperties.isEnabled()</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">                &amp;&amp; !isBlank(razorpayProperties.getKeyId())</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">                &amp;&amp; !isBlank(razorpayProperties.getKeySecret());</span>
+    }
+
+    private String resolveUrl(String path) {
+<span class="nc" id="L237">        String baseUrl = razorpayProperties.getBaseUrl();</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        if (baseUrl.endsWith(&quot;/&quot;)) {</span>
+<span class="nc" id="L239">            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);</span>
+        }
+<span class="nc" id="L241">        return baseUrl + path;</span>
+    }
+
+    private String authorizationHeader() {
+<span class="nc" id="L245">        String credentials = razorpayProperties.getKeyId() + &quot;:&quot; + razorpayProperties.getKeySecret();</span>
+<span class="nc" id="L246">        return &quot;Basic &quot; + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));</span>
+    }
+
+    private String writeBody(Object body) {
+        try {
+<span class="nc" id="L251">            return objectMapper.writeValueAsString(body);</span>
+<span class="nc" id="L252">        } catch (IOException exception) {</span>
+<span class="nc" id="L253">            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, &quot;Could not serialize Razorpay request&quot;, exception);</span>
+        }
+    }
+
+    private String text(JsonNode node, String field) {
+<span class="nc" id="L258">        JsonNode value = node.get(field);</span>
+<span class="nc bnc" id="L259" title="All 4 branches missed.">        return value == null || value.isNull() ? &quot;&quot; : value.asText(&quot;&quot;);</span>
+    }
+
+    private String safeValue(String value, String fallback) {
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        return isBlank(value) ? fallback : value.trim();</span>
+    }
+
+    private boolean isBlank(String value) {
+<span class="nc bnc" id="L267" title="All 4 branches missed.">        return value == null || value.isBlank();</span>
+    }
+
+    private String bytesToHex(byte[] bytes) {
+<span class="nc" id="L271">        StringBuilder builder = new StringBuilder(bytes.length * 2);</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        for (byte value : bytes) {</span>
+<span class="nc" id="L273">            builder.append(String.format(&quot;%02x&quot;, value));</span>
+        }
+<span class="nc" id="L275">        return builder.toString();</span>
+    }
+
+    private record PendingRazorpayOrder(
+            String orderId,
+            long amountSubunits,
+            String currency,
+            String customerName,
+            String email,
+            String contact,
+            String receiverName
+    ) {
+    }
+
+    private record RazorpayPaymentDetails(
+            String paymentId,
+            String orderId,
+            String status,
+            String method
+    ) {
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

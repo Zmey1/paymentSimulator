@@ -1,0 +1,218 @@
+<h2>Dashboard Design Preview</h2>
+<p class="subtitle">Here's how the actual dashboard would look. Does this feel right?</p>
+
+<div class="mockup">
+  <div class="mockup-header">PayFlow Simulator — Full Dashboard</div>
+  <div class="mockup-body" style="background: #0a0a1a; padding: 0; overflow: hidden;">
+    <div style="color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px;">
+
+      <!-- Top Navigation Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 24px; background: linear-gradient(135deg, #0f1729 0%, #16213e 100%); border-bottom: 1px solid #1e3a5f;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:32px; height:32px; background: linear-gradient(135deg, #4fc3f7, #0288d1); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; font-size:16px;">P</div>
+          <span style="font-weight:700; color:#fff; font-size:18px;">PayFlow</span>
+          <span style="color:#4fc3f7; font-size:12px; font-weight:400;">Simulator</span>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <div style="display:flex; align-items:center; gap:5px; background:rgba(39,174,96,0.15); padding:4px 12px; border-radius:20px; border:1px solid rgba(39,174,96,0.3);">
+            <div style="width:6px; height:6px; background:#27ae60; border-radius:50%; box-shadow:0 0 6px #27ae60;"></div>
+            <span style="font-size:11px; color:#27ae60;">Kafka Connected</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:5px; background:rgba(39,174,96,0.15); padding:4px 12px; border-radius:20px; border:1px solid rgba(39,174,96,0.3);">
+            <div style="width:6px; height:6px; background:#27ae60; border-radius:50%; box-shadow:0 0 6px #27ae60;"></div>
+            <span style="font-size:11px; color:#27ae60;">PostgreSQL Online</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div style="display:flex; gap:16px; padding: 20px 24px 0;">
+        <div style="flex:1; background: linear-gradient(135deg, #16213e, #1a2744); padding:16px 20px; border-radius:12px; border:1px solid #1e3a5f; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(79,195,247,0.08); border-radius:50%;"></div>
+          <div style="font-size:11px; color:#7a8ba8; text-transform:uppercase; letter-spacing:1px;">Total Payments</div>
+          <div style="font-size:32px; font-weight:800; color:#fff; margin-top:4px;">247</div>
+          <div style="font-size:11px; color:#4fc3f7; margin-top:4px;">↑ 12 in last hour</div>
+        </div>
+        <div style="flex:1; background: linear-gradient(135deg, #16213e, #1a2744); padding:16px 20px; border-radius:12px; border:1px solid #1e3a5f; border-left:3px solid #27ae60;">
+          <div style="font-size:11px; color:#7a8ba8; text-transform:uppercase; letter-spacing:1px;">Approved</div>
+          <div style="font-size:32px; font-weight:800; color:#27ae60; margin-top:4px;">218</div>
+          <div style="font-size:11px; color:#6b7b8d; margin-top:4px;">88.3% approval rate</div>
+        </div>
+        <div style="flex:1; background: linear-gradient(135deg, #16213e, #1a2744); padding:16px 20px; border-radius:12px; border:1px solid #1e3a5f; border-left:3px solid #e74c3c;">
+          <div style="font-size:11px; color:#7a8ba8; text-transform:uppercase; letter-spacing:1px;">Flagged</div>
+          <div style="font-size:32px; font-weight:800; color:#e74c3c; margin-top:4px;">12</div>
+          <div style="font-size:11px; color:#6b7b8d; margin-top:4px;">Amount > ₹50,000</div>
+        </div>
+        <div style="flex:1; background: linear-gradient(135deg, #16213e, #1a2744); padding:16px 20px; border-radius:12px; border:1px solid #1e3a5f; border-left:3px solid #e67e22;">
+          <div style="font-size:11px; color:#7a8ba8; text-transform:uppercase; letter-spacing:1px;">Pending</div>
+          <div style="font-size:32px; font-weight:800; color:#e67e22; margin-top:4px;">17</div>
+          <div style="font-size:11px; color:#6b7b8d; margin-top:4px;">In pipeline now</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Visualization -->
+      <div style="margin: 20px 24px; background: linear-gradient(135deg, #16213e, #1a2744); border-radius:12px; padding:20px; border:1px solid #1e3a5f;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="font-size:13px; font-weight:700; color:#fff;">Event Pipeline</div>
+          <div style="font-size:11px; color:#4fc3f7;">Live ●</div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:0;">
+          <!-- Step 1: Payment Created -->
+          <div style="text-align:center; flex:1;">
+            <div style="background: linear-gradient(135deg, #0d47a1, #1565c0); width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto; border:2px solid #4fc3f7; box-shadow: 0 0 15px rgba(79,195,247,0.2);">
+              <span style="font-size:24px;">💳</span>
+            </div>
+            <div style="font-size:11px; font-weight:600; color:#fff; margin-top:8px;">Payment Service</div>
+            <div style="font-size:9px; color:#7a8ba8; margin-top:2px;">REST API + DB</div>
+          </div>
+          <!-- Arrow -->
+          <div style="flex:0.5; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:9px; color:#4fc3f7; margin-bottom:4px;">payment-created</div>
+            <div style="width:100%; height:2px; background: linear-gradient(90deg, #4fc3f7, #e67e22); position:relative;">
+              <div style="position:absolute; right:-4px; top:-3px; width:0; height:0; border-left:8px solid #e67e22; border-top:4px solid transparent; border-bottom:4px solid transparent;"></div>
+            </div>
+          </div>
+          <!-- Step 2: Kafka -->
+          <div style="text-align:center; flex:1;">
+            <div style="background: linear-gradient(135deg, #e65100, #f57c00); width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto; border:2px solid #e67e22; box-shadow: 0 0 15px rgba(230,126,34,0.2);">
+              <span style="font-size:24px;">📨</span>
+            </div>
+            <div style="font-size:11px; font-weight:600; color:#fff; margin-top:8px;">Apache Kafka</div>
+            <div style="font-size:9px; color:#7a8ba8; margin-top:2px;">Event Broker</div>
+          </div>
+          <!-- Arrow -->
+          <div style="flex:0.5; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:9px; color:#e67e22; margin-bottom:4px;">consume</div>
+            <div style="width:100%; height:2px; background: linear-gradient(90deg, #e67e22, #e74c3c); position:relative;">
+              <div style="position:absolute; right:-4px; top:-3px; width:0; height:0; border-left:8px solid #e74c3c; border-top:4px solid transparent; border-bottom:4px solid transparent;"></div>
+            </div>
+          </div>
+          <!-- Step 3: Fraud Detection -->
+          <div style="text-align:center; flex:1;">
+            <div style="background: linear-gradient(135deg, #b71c1c, #d32f2f); width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto; border:2px solid #e74c3c; box-shadow: 0 0 15px rgba(231,76,60,0.2);">
+              <span style="font-size:24px;">🔍</span>
+            </div>
+            <div style="font-size:11px; font-weight:600; color:#fff; margin-top:8px;">Fraud Detection</div>
+            <div style="font-size:9px; color:#7a8ba8; margin-top:2px;">Rule Engine</div>
+          </div>
+          <!-- Arrow -->
+          <div style="flex:0.5; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:9px; color:#e74c3c; margin-bottom:4px;">approved/flagged</div>
+            <div style="width:100%; height:2px; background: linear-gradient(90deg, #e74c3c, #27ae60); position:relative;">
+              <div style="position:absolute; right:-4px; top:-3px; width:0; height:0; border-left:8px solid #27ae60; border-top:4px solid transparent; border-bottom:4px solid transparent;"></div>
+            </div>
+          </div>
+          <!-- Step 4: Notification -->
+          <div style="text-align:center; flex:1;">
+            <div style="background: linear-gradient(135deg, #1b5e20, #2e7d32); width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto; border:2px solid #27ae60; box-shadow: 0 0 15px rgba(39,174,96,0.2);">
+              <span style="font-size:24px;">🔔</span>
+            </div>
+            <div style="font-size:11px; font-weight:600; color:#fff; margin-top:8px;">Notification</div>
+            <div style="font-size:9px; color:#7a8ba8; margin-top:2px;">Email + SMS Alerts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom section: Form + Table side by side -->
+      <div style="display:flex; gap:16px; padding: 0 24px 20px;">
+        <!-- Submit Form -->
+        <div style="flex:1; background: linear-gradient(135deg, #16213e, #1a2744); border-radius:12px; padding:20px; border:1px solid #1e3a5f;">
+          <div style="font-size:13px; font-weight:700; color:#fff; margin-bottom:16px;">Submit Payment</div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:10px; color:#7a8ba8; margin-bottom:4px;">SENDER</div>
+            <div style="background:#0d1b30; border:1px solid #1e3a5f; border-radius:6px; padding:8px 12px; color:#ccc; font-size:12px;">John Doe</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:10px; color:#7a8ba8; margin-bottom:4px;">RECEIVER</div>
+            <div style="background:#0d1b30; border:1px solid #1e3a5f; border-radius:6px; padding:8px 12px; color:#ccc; font-size:12px;">Jane Smith</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:10px; color:#7a8ba8; margin-bottom:4px;">AMOUNT (₹)</div>
+            <div style="background:#0d1b30; border:1px solid #1e3a5f; border-radius:6px; padding:8px 12px; color:#ccc; font-size:12px;">25,000.00</div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:10px; color:#7a8ba8; margin-bottom:4px;">PAYMENT TYPE</div>
+            <div style="background:#0d1b30; border:1px solid #1e3a5f; border-radius:6px; padding:8px 12px; color:#ccc; font-size:12px;">UPI ▾</div>
+          </div>
+          <div style="background: linear-gradient(135deg, #4fc3f7, #0288d1); padding:10px; border-radius:8px; text-align:center; font-weight:700; color:#fff; font-size:13px; cursor:pointer;">Submit Payment</div>
+        </div>
+
+        <!-- Payment History Table -->
+        <div style="flex:2; background: linear-gradient(135deg, #16213e, #1a2744); border-radius:12px; padding:20px; border:1px solid #1e3a5f;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div style="font-size:13px; font-weight:700; color:#fff;">Recent Payments</div>
+            <div style="font-size:11px; color:#7a8ba8;">Auto-refreshing every 3s</div>
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:11px;">
+            <thead>
+              <tr style="border-bottom:1px solid #1e3a5f;">
+                <th style="padding:8px; text-align:left; color:#7a8ba8; font-weight:600;">ID</th>
+                <th style="padding:8px; text-align:left; color:#7a8ba8; font-weight:600;">Sender</th>
+                <th style="padding:8px; text-align:left; color:#7a8ba8; font-weight:600;">Receiver</th>
+                <th style="padding:8px; text-align:right; color:#7a8ba8; font-weight:600;">Amount</th>
+                <th style="padding:8px; text-align:center; color:#7a8ba8; font-weight:600;">Type</th>
+                <th style="padding:8px; text-align:center; color:#7a8ba8; font-weight:600;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(30,58,95,0.5);">
+                <td style="padding:8px; color:#4fc3f7; font-family:monospace;">a3f8c2d1</td>
+                <td style="padding:8px; color:#ddd;">Rahul K.</td>
+                <td style="padding:8px; color:#ddd;">Priya M.</td>
+                <td style="padding:8px; text-align:right; color:#fff; font-weight:600;">₹15,000</td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(79,195,247,0.15); color:#4fc3f7; padding:2px 8px; border-radius:10px; font-size:10px;">UPI</span></td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(39,174,96,0.15); color:#27ae60; padding:2px 8px; border-radius:10px; font-size:10px;">● APPROVED</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(30,58,95,0.5);">
+                <td style="padding:8px; color:#4fc3f7; font-family:monospace;">b7e1f9a4</td>
+                <td style="padding:8px; color:#ddd;">Amit S.</td>
+                <td style="padding:8px; color:#ddd;">Neha R.</td>
+                <td style="padding:8px; text-align:right; color:#fff; font-weight:600;">₹75,000</td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(230,126,34,0.15); color:#e67e22; padding:2px 8px; border-radius:10px; font-size:10px;">TRANSFER</span></td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(231,76,60,0.15); color:#e74c3c; padding:2px 8px; border-radius:10px; font-size:10px;">● FLAGGED</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(30,58,95,0.5);">
+                <td style="padding:8px; color:#4fc3f7; font-family:monospace;">c2d5e8b3</td>
+                <td style="padding:8px; color:#ddd;">Sana P.</td>
+                <td style="padding:8px; color:#ddd;">Vikram J.</td>
+                <td style="padding:8px; text-align:right; color:#fff; font-weight:600;">₹8,500</td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(156,39,176,0.15); color:#ba68c8; padding:2px 8px; border-radius:10px; font-size:10px;">CARD</span></td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(230,126,34,0.15); color:#e67e22; padding:2px 8px; border-radius:10px; font-size:10px;">● PENDING</span></td>
+              </tr>
+              <tr>
+                <td style="padding:8px; color:#4fc3f7; font-family:monospace;">d9a2c7f6</td>
+                <td style="padding:8px; color:#ddd;">Deepa L.</td>
+                <td style="padding:8px; color:#ddd;">Arjun B.</td>
+                <td style="padding:8px; text-align:right; color:#fff; font-weight:600;">₹32,000</td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(79,195,247,0.15); color:#4fc3f7; padding:2px 8px; border-radius:10px; font-size:10px;">UPI</span></td>
+                <td style="padding:8px; text-align:center;"><span style="background:rgba(39,174,96,0.15); color:#27ae60; padding:2px 8px; border-radius:10px; font-size:10px;">● APPROVED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 24px;">
+  <h3>What do you think of this design direction?</h3>
+  <p class="subtitle">Click an option below</p>
+  <div class="options">
+    <div class="option" data-choice="looks-good" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Looks great, let's go with this</h3>
+        <p>Dark theme, stats cards, pipeline diagram, professional table — all good</p>
+      </div>
+    </div>
+    <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>I like it but want to tweak some things</h3>
+        <p>Tell me what to change in the terminal</p>
+      </div>
+    </div>
+  </div>
+</div>

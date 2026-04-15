@@ -1,0 +1,4 @@
+/home/zmey1/VSCODE_FILES/devops/services/notification-service/src/main/java/com/payments/notification/NotificationServiceApplication.java
+/home/zmey1/VSCODE_FILES/devops/services/notification-service/src/main/java/com/payments/notification/model/PaymentEvent.java
+/home/zmey1/VSCODE_FILES/devops/services/notification-service/src/main/java/com/payments/notification/kafka/NotificationConsumer.java
+/home/zmey1/VSCODE_FILES/devops/services/notification-service/src/main/java/com/payments/notification/service/NotificationService.java

@@ -1,0 +1,17 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+payment-service,com.payments.paymentservice,PaymentServiceApplication,5,3,0,0,2,1,1,1,1,1
+payment-service,com.payments.paymentservice.dto,RazorpayVerifyRequest,0,12,0,0,0,1,0,1,0,1
+payment-service,com.payments.paymentservice.dto,RazorpayCheckoutStatusResponse,0,18,0,0,0,1,0,1,0,1
+payment-service,com.payments.paymentservice.dto,RazorpayOrderResponse,0,30,0,0,0,1,0,1,0,1
+payment-service,com.payments.paymentservice.dto,RazorpayOrderRequest,0,15,0,0,0,1,0,1,0,1
+payment-service,com.payments.paymentservice.model,PaymentEvent,37,39,0,0,11,14,10,6,10,6
+payment-service,com.payments.paymentservice.model,Payment,0,68,0,0,0,21,0,17,0,17
+payment-service,com.payments.paymentservice.kafka,PaymentEventConsumer,69,0,4,0,19,0,5,0,3,0
+payment-service,com.payments.paymentservice.kafka,PaymentProducer,0,24,0,0,0,7,0,3,0,3
+payment-service,com.payments.paymentservice.controller,PaymentController,3,56,1,1,1,14,1,8,0,8
+payment-service,com.payments.paymentservice.service,RazorpayGatewayService,635,0,64,0,142,0,50,0,17,0
+payment-service,com.payments.paymentservice.service,RazorpayGatewayService.PendingRazorpayOrder,24,0,0,0,1,0,1,0,1,0
+payment-service,com.payments.paymentservice.service,PaymentService,0,98,0,0,0,25,0,5,0,5
+payment-service,com.payments.paymentservice.service,RazorpayGatewayService.RazorpayPaymentDetails,15,0,0,0,1,0,1,0,1,0
+payment-service,com.payments.paymentservice.config,CorsConfig,0,37,0,0,0,6,0,2,0,2
+payment-service,com.payments.paymentservice.config,RazorpayProperties,21,49,0,0,7,21,7,8,7,8

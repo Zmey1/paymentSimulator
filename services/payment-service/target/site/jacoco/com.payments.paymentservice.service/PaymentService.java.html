@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payment-service</a> &gt; <a href="index.source.html" class="el_package">com.payments.paymentservice.service</a> &gt; <span class="el_source">PaymentService.java</span></div><h1>PaymentService.java</h1><pre class="source lang-java linenums">package com.payments.paymentservice.service;
+
+import com.payments.paymentservice.kafka.PaymentProducer;
+import com.payments.paymentservice.model.Payment;
+import com.payments.paymentservice.model.PaymentEvent;
+import com.payments.paymentservice.repository.PaymentRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@Service
+public class PaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final PaymentProducer paymentProducer;
+
+<span class="fc" id="L20">    public PaymentService(PaymentRepository paymentRepository, PaymentProducer paymentProducer) {</span>
+<span class="fc" id="L21">        this.paymentRepository = paymentRepository;</span>
+<span class="fc" id="L22">        this.paymentProducer = paymentProducer;</span>
+<span class="fc" id="L23">    }</span>
+
+    public Payment createPayment(Payment payment) {
+<span class="fc" id="L26">        payment.setId(UUID.randomUUID().toString());</span>
+<span class="fc" id="L27">        payment.setStatus(&quot;PENDING&quot;);</span>
+<span class="fc" id="L28">        Payment saved = paymentRepository.save(payment);</span>
+
+<span class="fc" id="L30">        PaymentEvent event = new PaymentEvent(</span>
+<span class="fc" id="L31">                saved.getId(),</span>
+<span class="fc" id="L32">                saved.getSender(),</span>
+<span class="fc" id="L33">                saved.getReceiver(),</span>
+<span class="fc" id="L34">                saved.getAmount(),</span>
+<span class="fc" id="L35">                saved.getPaymentType(),</span>
+<span class="fc" id="L36">                saved.getStatus(),</span>
+<span class="fc" id="L37">                System.currentTimeMillis()</span>
+        );
+<span class="fc" id="L39">        paymentProducer.sendPaymentCreated(event);</span>
+
+<span class="fc" id="L41">        return saved;</span>
+    }
+
+    public List&lt;Payment&gt; getAllPayments() {
+<span class="fc" id="L45">        return paymentRepository.findAll();</span>
+    }
+
+    public Map&lt;String, Long&gt; getPaymentStats() {
+<span class="fc" id="L49">        Map&lt;String, Long&gt; stats = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L50">        stats.put(&quot;total&quot;, paymentRepository.count());</span>
+<span class="fc" id="L51">        stats.put(&quot;approved&quot;, paymentRepository.countByStatus(&quot;APPROVED&quot;));</span>
+<span class="fc" id="L52">        stats.put(&quot;flagged&quot;, paymentRepository.countByStatus(&quot;FLAGGED&quot;));</span>
+<span class="fc" id="L53">        stats.put(&quot;pending&quot;, paymentRepository.countByStatus(&quot;PENDING&quot;));</span>
+<span class="fc" id="L54">        return stats;</span>
+    }
+
+    public Payment getPaymentById(String id) {
+<span class="fc" id="L58">        return paymentRepository.findById(id).orElse(null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

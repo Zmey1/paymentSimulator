@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/payments}
+    username: ${SPRING_DATASOURCE_USERNAME:payments_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:payments_pass}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: payment-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.payments.paymentservice.model.PaymentEvent
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+payment:
+  gateway:
+    razorpay:
+      enabled: ${RAZORPAY_ENABLED:false}
+      key-id: ${RAZORPAY_KEY_ID:}
+      key-secret: ${RAZORPAY_KEY_SECRET:}
+      base-url: ${RAZORPAY_BASE_URL:https://api.razorpay.com/v1}
+      merchant-name: ${RAZORPAY_MERCHANT_NAME:PayFlow Demo}
+      description: ${RAZORPAY_DESCRIPTION:Sandbox Checkout}
+      receiver-name: ${RAZORPAY_RECEIVER_NAME:Demo Merchant}

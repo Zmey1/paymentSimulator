@@ -1,0 +1,36 @@
+---
+- name: Install pip3
+  apt:
+    name: python3-pip
+    state: present
+    update_cache: yes
+
+- name: Install Docker Python SDK
+  pip:
+    name: docker
+    state: present
+    executable: pip3
+
+- name: Set vm.max_map_count for SonarQube
+  sysctl:
+    name: vm.max_map_count
+    value: "262144"
+    state: present
+    reload: yes
+
+- name: Create SonarQube data directory
+  file:
+    path: /opt/sonarqube_data
+    state: directory
+    mode: '0777'
+
+- name: Run SonarQube container
+  community.docker.docker_container:
+    name: sonarqube
+    image: sonarqube:community
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /opt/sonarqube_data:/opt/sonarqube/data

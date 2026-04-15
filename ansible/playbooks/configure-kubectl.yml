@@ -1,0 +1,35 @@
+---
+- name: Configure kubectl for EKS
+  hosts: jenkins
+  become: yes
+  vars:
+    eks_cluster_name: "{{ lookup('env', 'EKS_CLUSTER_NAME') | default('payments-sim-eks', true) }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') | default('ap-south-1', true) }}"
+  tasks:
+    - name: Ensure jenkins .kube directory exists
+      file:
+        path: /var/lib/jenkins/.kube
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Update kubeconfig for EKS (as root, write to jenkins home)
+      shell: "aws eks update-kubeconfig --name {{ eks_cluster_name }} --region {{ aws_region }} --kubeconfig /var/lib/jenkins/.kube/config"
+      environment:
+        HOME: /root
+
+    - name: Set kubeconfig ownership to jenkins
+      file:
+        path: /var/lib/jenkins/.kube/config
+        owner: jenkins
+        group: jenkins
+        mode: '0600'
+
+    - name: Verify kubectl connection
+      shell: kubectl get nodes --kubeconfig /var/lib/jenkins/.kube/config
+      register: kubectl_result
+
+    - name: Show cluster nodes
+      debug:
+        var: kubectl_result.stdout_lines

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RazorpayProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payment-service</a> &gt; <a href="index.source.html" class="el_package">com.payments.paymentservice.config</a> &gt; <span class="el_source">RazorpayProperties.java</span></div><h1>RazorpayProperties.java</h1><pre class="source lang-java linenums">package com.payments.paymentservice.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = &quot;payment.gateway.razorpay&quot;)
+<span class="fc" id="L6">public class RazorpayProperties {</span>
+
+    private boolean enabled;
+<span class="fc" id="L9">    private String keyId = &quot;&quot;;</span>
+<span class="fc" id="L10">    private String keySecret = &quot;&quot;;</span>
+<span class="fc" id="L11">    private String baseUrl = &quot;https://api.razorpay.com/v1&quot;;</span>
+<span class="fc" id="L12">    private String merchantName = &quot;PayFlow Demo&quot;;</span>
+<span class="fc" id="L13">    private String description = &quot;Sandbox Checkout&quot;;</span>
+<span class="fc" id="L14">    private String receiverName = &quot;Demo Merchant&quot;;</span>
+
+    public boolean isEnabled() {
+<span class="nc" id="L17">        return enabled;</span>
+    }
+
+    public void setEnabled(boolean enabled) {
+<span class="fc" id="L21">        this.enabled = enabled;</span>
+<span class="fc" id="L22">    }</span>
+
+    public String getKeyId() {
+<span class="nc" id="L25">        return keyId;</span>
+    }
+
+    public void setKeyId(String keyId) {
+<span class="fc" id="L29">        this.keyId = keyId;</span>
+<span class="fc" id="L30">    }</span>
+
+    public String getKeySecret() {
+<span class="nc" id="L33">        return keySecret;</span>
+    }
+
+    public void setKeySecret(String keySecret) {
+<span class="fc" id="L37">        this.keySecret = keySecret;</span>
+<span class="fc" id="L38">    }</span>
+
+    public String getBaseUrl() {
+<span class="nc" id="L41">        return baseUrl;</span>
+    }
+
+    public void setBaseUrl(String baseUrl) {
+<span class="fc" id="L45">        this.baseUrl = baseUrl;</span>
+<span class="fc" id="L46">    }</span>
+
+    public String getMerchantName() {
+<span class="nc" id="L49">        return merchantName;</span>
+    }
+
+    public void setMerchantName(String merchantName) {
+<span class="fc" id="L53">        this.merchantName = merchantName;</span>
+<span class="fc" id="L54">    }</span>
+
+    public String getDescription() {
+<span class="nc" id="L57">        return description;</span>
+    }
+
+    public void setDescription(String description) {
+<span class="fc" id="L61">        this.description = description;</span>
+<span class="fc" id="L62">    }</span>
+
+    public String getReceiverName() {
+<span class="nc" id="L65">        return receiverName;</span>
+    }
+
+    public void setReceiverName(String receiverName) {
+<span class="fc" id="L69">        this.receiverName = receiverName;</span>
+<span class="fc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

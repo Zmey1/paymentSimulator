@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentEventConsumer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">fraud-detection-service</a> &gt; <a href="index.source.html" class="el_package">com.payments.frauddetection.kafka</a> &gt; <span class="el_source">PaymentEventConsumer.java</span></div><h1>PaymentEventConsumer.java</h1><pre class="source lang-java linenums">package com.payments.frauddetection.kafka;
+
+import com.payments.frauddetection.model.PaymentEvent;
+import com.payments.frauddetection.service.FraudCheckService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PaymentEventConsumer {
+
+<span class="nc" id="L13">    private static final Logger log = LoggerFactory.getLogger(PaymentEventConsumer.class);</span>
+    private final FraudCheckService fraudCheckService;
+    private final FraudResultProducer fraudResultProducer;
+
+<span class="nc" id="L17">    public PaymentEventConsumer(FraudCheckService fraudCheckService, FraudResultProducer fraudResultProducer) {</span>
+<span class="nc" id="L18">        this.fraudCheckService = fraudCheckService;</span>
+<span class="nc" id="L19">        this.fraudResultProducer = fraudResultProducer;</span>
+<span class="nc" id="L20">    }</span>
+
+    @KafkaListener(topics = PaymentEvent.TOPIC_CREATED, groupId = &quot;fraud-detection-group&quot;)
+    public void handlePaymentCreated(PaymentEvent event) {
+<span class="nc" id="L24">        log.info(&quot;Received payment-created event: paymentId={}, amount={}&quot;,</span>
+<span class="nc" id="L25">                event.getPaymentId(), event.getAmount());</span>
+
+<span class="nc" id="L27">        String result = fraudCheckService.checkFraud(event);</span>
+<span class="nc" id="L28">        event.setStatus(result);</span>
+<span class="nc" id="L29">        event.setTimestamp(System.currentTimeMillis());</span>
+
+<span class="nc" id="L31">        fraudResultProducer.sendResult(event);</span>
+<span class="nc" id="L32">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

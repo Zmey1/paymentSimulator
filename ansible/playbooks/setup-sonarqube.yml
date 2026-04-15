@@ -1,0 +1,6 @@
+---
+- name: Setup SonarQube
+  hosts: jenkins
+  become: yes
+  roles:
+    - sonarqube

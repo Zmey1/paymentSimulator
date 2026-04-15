@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FraudCheckService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">fraud-detection-service</a> &gt; <a href="index.source.html" class="el_package">com.payments.frauddetection.service</a> &gt; <span class="el_source">FraudCheckService.java</span></div><h1>FraudCheckService.java</h1><pre class="source lang-java linenums">package com.payments.frauddetection.service;
+
+import com.payments.frauddetection.config.FraudRuleProperties;
+import com.payments.frauddetection.model.PaymentEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Service
+public class FraudCheckService {
+
+<span class="fc" id="L20">    private static final Logger log = LoggerFactory.getLogger(FraudCheckService.class);</span>
+<span class="fc" id="L21">    private static final BigDecimal ROUND_AMOUNT_FACTOR = BigDecimal.valueOf(10000);</span>
+
+    private final FraudRuleProperties fraudRuleProperties;
+<span class="fc" id="L24">    private final Map&lt;String, List&lt;Long&gt;&gt; senderPaymentTimestamps = new ConcurrentHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L26">    public FraudCheckService(FraudRuleProperties fraudRuleProperties) {</span>
+<span class="fc" id="L27">        this.fraudRuleProperties = fraudRuleProperties;</span>
+<span class="fc" id="L28">    }</span>
+
+    public String checkFraud(PaymentEvent event) {
+<span class="fc" id="L31">        long timestamp = resolveTimestamp(event);</span>
+<span class="fc" id="L32">        int velocityHits = updateVelocityWindow(event.getSender(), timestamp);</span>
+
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (event.getAmount() &gt; fraudRuleProperties.getAmountThreshold()) {</span>
+<span class="fc" id="L35">            log.warn(&quot;Payment flagged: paymentId={}, rule=HIGH_AMOUNT, details=\&quot;amount={} exceeds threshold {}\&quot;&quot;,</span>
+<span class="fc" id="L36">                    event.getPaymentId(), event.getAmount(), fraudRuleProperties.getAmountThreshold());</span>
+<span class="fc" id="L37">            return &quot;FLAGGED&quot;;</span>
+        }
+
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (velocityHits &gt;= fraudRuleProperties.getVelocityCount()) {</span>
+<span class="fc" id="L41">            log.warn(&quot;Payment flagged: paymentId={}, rule=VELOCITY, details=\&quot;{} payments from sender '{}' in {}s\&quot;&quot;,</span>
+<span class="fc" id="L42">                    event.getPaymentId(), velocityHits, event.getSender(), fraudRuleProperties.getVelocityWindowSeconds());</span>
+<span class="fc" id="L43">            return &quot;FLAGGED&quot;;</span>
+        }
+
+<span class="pc bpc" id="L46" title="1 of 4 branches missed.">        if (fraudRuleProperties.isSelfTransferEnabled() &amp;&amp; isSelfTransfer(event)) {</span>
+<span class="fc" id="L47">            log.warn(&quot;Payment flagged: paymentId={}, rule=SELF_TRANSFER, details=\&quot;sender '{}' matches receiver '{}'\&quot;&quot;,</span>
+<span class="fc" id="L48">                    event.getPaymentId(), event.getSender(), event.getReceiver());</span>
+<span class="fc" id="L49">            return &quot;FLAGGED&quot;;</span>
+        }
+
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (isSuspiciousRoundAmount(event.getAmount())) {</span>
+<span class="fc" id="L53">            log.warn(&quot;Payment flagged: paymentId={}, rule=ROUND_AMOUNT, details=\&quot;amount={} is a round figure above minimum {}\&quot;&quot;,</span>
+<span class="fc" id="L54">                    event.getPaymentId(), event.getAmount(), fraudRuleProperties.getRoundAmountMinimum());</span>
+<span class="fc" id="L55">            return &quot;FLAGGED&quot;;</span>
+        }
+
+<span class="fc" id="L58">        log.info(&quot;Payment approved: paymentId={}, amount={}, rulesChecked={}&quot;,</span>
+<span class="fc" id="L59">                event.getPaymentId(), event.getAmount(), countEnabledRules());</span>
+<span class="fc" id="L60">        return &quot;APPROVED&quot;;</span>
+    }
+
+    private long resolveTimestamp(PaymentEvent event) {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        return event.getTimestamp() &gt; 0 ? event.getTimestamp() : System.currentTimeMillis();</span>
+    }
+
+    private int updateVelocityWindow(String sender, long timestamp) {
+<span class="pc bpc" id="L68" title="3 of 6 branches missed.">        if (sender == null || sender.isBlank() || fraudRuleProperties.getVelocityCount() &lt;= 0) {</span>
+<span class="nc" id="L69">            return 0;</span>
+        }
+
+<span class="fc" id="L72">        String senderKey = sender.trim().toLowerCase(Locale.ROOT);</span>
+<span class="fc" id="L73">        List&lt;Long&gt; timestamps = senderPaymentTimestamps.computeIfAbsent(</span>
+<span class="fc" id="L74">                senderKey, ignored -&gt; Collections.synchronizedList(new ArrayList&lt;&gt;())</span>
+        );
+<span class="fc" id="L76">        long windowStart = timestamp - (fraudRuleProperties.getVelocityWindowSeconds() * 1000);</span>
+
+<span class="fc" id="L78">        synchronized (timestamps) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            timestamps.removeIf(entry -&gt; entry &lt; windowStart);</span>
+<span class="fc" id="L80">            timestamps.add(timestamp);</span>
+<span class="fc" id="L81">            return timestamps.size();</span>
+        }
+    }
+
+    private boolean isSelfTransfer(PaymentEvent event) {
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        return event.getSender() != null</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                &amp;&amp; event.getReceiver() != null</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                &amp;&amp; event.getSender().equalsIgnoreCase(event.getReceiver());</span>
+    }
+
+    private boolean isSuspiciousRoundAmount(double amount) {
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (amount &lt;= fraudRuleProperties.getRoundAmountMinimum()) {</span>
+<span class="fc" id="L93">            return false;</span>
+        }
+
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        return BigDecimal.valueOf(amount).remainder(ROUND_AMOUNT_FACTOR).compareTo(BigDecimal.ZERO) == 0;</span>
+    }
+
+    private int countEnabledRules() {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        return fraudRuleProperties.isSelfTransferEnabled() ? 4 : 3;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
