@@ -42,7 +42,7 @@ services:
   payment-service:
     build: ./services/payment-service
     ports:
-      - "8080:8080"
+      - "8180:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payments
       SPRING_DATASOURCE_USERNAME: payments_user
