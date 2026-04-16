@@ -170,14 +170,19 @@ pipeline {
             steps {
                 sh 'docker compose up -d'
                 sh 'sleep 30'
-                dir('tests') {
-                    sh 'mvn test -B'
-                }
+                sh 'docker compose run --rm integration-tests'
+                sh 'docker cp $(docker compose ps -q payment-dashboard | head -1):/dev/null /dev/null 2>/dev/null || true'
             }
             post {
                 always {
-                    sh 'docker compose down -v'
-                    junit 'tests/target/surefire-reports/*.xml'
+                    sh '''
+                        CONTAINER_ID=$(docker compose ps -aq integration-tests 2>/dev/null | head -1)
+                        if [ -n "$CONTAINER_ID" ]; then
+                            docker cp "$CONTAINER_ID":/app/target/surefire-reports tests/target/surefire-reports 2>/dev/null || true
+                        fi
+                    '''
+                    sh 'docker compose --profile test down -v'
+                    junit allowEmptyResults: true, testResults: 'tests/target/surefire-reports/*.xml'
                 }
             }
         }
