@@ -1,12 +1,13 @@
 replicaCount: 1
 
 persistence:
-  size: 8Gi
+  enabled: false
+
+kraft:
+  enabled: true
 
 zookeeper:
-  replicaCount: 1
-  persistence:
-    size: 8Gi
+  enabled: false
 
 listeners:
   client:
