@@ -1,7 +1,9 @@
 ---
-- name: Install Java 21
+- name: Install Java 21 and Maven
   apt:
-    name: openjdk-21-jdk
+    name:
+      - openjdk-21-jdk
+      - maven
     state: present
     update_cache: yes
 
