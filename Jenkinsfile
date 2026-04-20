@@ -201,7 +201,7 @@ pipeline {
                       helm repo add bitnami https://charts.bitnami.com/bitnami
                     fi
                     helm repo update
-                    helm upgrade --install kafka bitnami/kafka --namespace default -f k8s/kafka/helm-values.yml --timeout 10m --wait
+                    helm upgrade --install kafka bitnami/kafka --namespace default -f k8s/kafka/helm-values.yml --timeout 5m
                 '''
             }
         }

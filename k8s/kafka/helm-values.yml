@@ -14,14 +14,4 @@ listeners:
     protocol: PLAINTEXT
 
 provisioning:
-  enabled: true
-  topics:
-    - name: payment.created
-      partitions: 3
-      replicationFactor: 1
-    - name: payment.approved
-      partitions: 3
-      replicationFactor: 1
-    - name: payment.flagged
-      partitions: 3
-      replicationFactor: 1
+  enabled: false
