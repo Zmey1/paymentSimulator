@@ -196,13 +196,7 @@ pipeline {
 
         stage('Deploy Kafka') {
             steps {
-                sh '''
-                    if ! helm repo list | awk 'NR > 1 {print $1}' | grep -qx bitnami; then
-                      helm repo add bitnami https://charts.bitnami.com/bitnami
-                    fi
-                    helm repo update
-                    helm upgrade --install kafka bitnami/kafka --namespace default -f k8s/kafka/helm-values.yml --timeout 5m
-                '''
+                sh 'kubectl apply -f k8s/kafka/kafka.yml'
             }
         }
 

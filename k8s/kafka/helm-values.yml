@@ -1,7 +1,10 @@
-replicaCount: 1
+controller:
+  replicaCount: 1
+  persistence:
+    enabled: false
 
-persistence:
-  enabled: false
+broker:
+  replicaCount: 0
 
 kraft:
   enabled: true
