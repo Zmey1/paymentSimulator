@@ -14,6 +14,10 @@ variable "eks_worker_sg_id" {
   type = string
 }
 
+variable "eks_cluster_sg_id" {
+  type = string
+}
+
 variable "db_username" {
   type = string
 }

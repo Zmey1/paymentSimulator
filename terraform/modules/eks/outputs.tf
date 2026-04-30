@@ -13,3 +13,7 @@ output "cluster_certificate_authority" {
 output "worker_sg_id" {
   value = aws_security_group.eks_workers.id
 }
+
+output "cluster_sg_id" {
+  value = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+}

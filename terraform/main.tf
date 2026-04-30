@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 module "vpc" {
   source       = "./modules/vpc"
   project_name = var.project_name
@@ -19,6 +21,7 @@ module "rds" {
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
   eks_worker_sg_id   = module.eks.worker_sg_id
+  eks_cluster_sg_id  = module.eks.cluster_sg_id
   db_username        = var.db_username
   db_password        = var.db_password
   db_name            = var.db_name
@@ -55,4 +58,22 @@ resource "aws_eks_access_policy_association" "jenkins_admin" {
   }
 
   depends_on = [aws_eks_access_entry.jenkins]
+}
+
+resource "aws_eks_access_entry" "operator" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = data.aws_caller_identity.current.arn
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "operator_admin" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = data.aws_caller_identity.current.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.operator]
 }

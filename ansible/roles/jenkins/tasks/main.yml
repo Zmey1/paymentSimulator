@@ -13,6 +13,8 @@
     state: absent
   loop:
     - /usr/share/keyrings/jenkins-keyring.gpg
+    - /usr/share/keyrings/jenkins-keyring.asc
+    - /etc/apt/keyrings/jenkins-keyring.gpg
     - /etc/apt/keyrings/jenkins-keyring.asc
 
 - name: Remove old Jenkins repo list if present
@@ -22,14 +24,13 @@
 
 - name: Add Jenkins GPG key
   shell: |
-    mkdir -p /etc/apt/keyrings
-    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key \
-      | gpg --dearmor -o /etc/apt/keyrings/jenkins-keyring.gpg
-    chmod a+r /etc/apt/keyrings/jenkins-keyring.gpg
+    curl -fsSL --connect-timeout 15 --max-time 60 \
+      https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key \
+      | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
 
 - name: Add Jenkins repository
   apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/"
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
     state: present
     filename: jenkins
 
@@ -62,7 +63,9 @@
 
 - name: Install kubectl
   shell: |
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    STABLE=$(curl -fsSL --connect-timeout 15 --max-time 30 https://dl.k8s.io/release/stable.txt)
+    curl -fsSL --connect-timeout 15 --max-time 120 \
+      "https://dl.k8s.io/release/${STABLE}/bin/linux/amd64/kubectl" -o kubectl
     install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     rm kubectl
   args:
@@ -70,7 +73,8 @@
 
 - name: Install AWS CLI
   shell: |
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    curl -fsSL --connect-timeout 15 --max-time 120 \
+      "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     apt-get install -y unzip
     unzip -o awscliv2.zip
     ./aws/install --update
@@ -80,6 +84,7 @@
 
 - name: Install Helm
   shell: |
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    curl -fsSL --connect-timeout 15 --max-time 120 \
+      https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   args:
     creates: /usr/local/bin/helm

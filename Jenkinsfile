@@ -235,10 +235,10 @@ pipeline {
                 sh 'kubectl apply -f .rendered/k8s/payment-dashboard/service.yml'
                 sh 'kubectl apply -f .rendered/k8s/payment-dashboard/deployment.yml'
 
-                sh 'kubectl rollout status deployment/payment-service --timeout=180s'
-                sh 'kubectl rollout status deployment/fraud-detection-service --timeout=180s'
-                sh 'kubectl rollout status deployment/notification-service --timeout=180s'
-                sh 'kubectl rollout status deployment/payment-dashboard --timeout=180s'
+                sh 'kubectl rollout status deployment/payment-service --timeout=300s'
+                sh 'kubectl rollout status deployment/fraud-detection-service --timeout=300s'
+                sh 'kubectl rollout status deployment/notification-service --timeout=300s'
+                sh 'kubectl rollout status deployment/payment-dashboard --timeout=300s'
                 sh 'kubectl get svc payment-dashboard'
             }
         }
@@ -252,7 +252,7 @@ pipeline {
                     --namespace monitoring --create-namespace \
                     -f k8s/monitoring/helm-values.yml \
                     --timeout 300s --wait'''
-                sh 'kubectl rollout status deployment/kube-prometheus-stack-grafana -n monitoring --timeout=180s'
+                sh 'kubectl rollout status deployment/kube-prometheus-stack-grafana -n monitoring --timeout=300s'
                 sh 'kubectl get svc -n monitoring kube-prometheus-stack-grafana'
             }
         }
