@@ -137,7 +137,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
@@ -240,6 +240,20 @@ pipeline {
                 sh 'kubectl rollout status deployment/notification-service --timeout=180s'
                 sh 'kubectl rollout status deployment/payment-dashboard --timeout=180s'
                 sh 'kubectl get svc payment-dashboard'
+            }
+        }
+
+        stage('Deploy Monitoring') {
+            steps {
+                sh 'helm repo add prometheus-community https://prometheus-community.github.io/helm-charts'
+                sh 'helm repo update'
+                sh '''helm upgrade --install kube-prometheus-stack \
+                    prometheus-community/kube-prometheus-stack \
+                    --namespace monitoring --create-namespace \
+                    -f k8s/monitoring/helm-values.yml \
+                    --timeout 300s --wait'''
+                sh 'kubectl rollout status deployment/kube-prometheus-stack-grafana -n monitoring --timeout=180s'
+                sh 'kubectl get svc -n monitoring kube-prometheus-stack-grafana'
             }
         }
     }
